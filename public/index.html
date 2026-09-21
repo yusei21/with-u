@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090b12" />
+    <meta name="description" content="Sala privada para assistir e ouvir juntos." />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237c5cff'/%3E%3Cpath d='M18 23h28v18H18z' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='m29 28 10 4-10 5z' fill='white'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <title>For U — Sala privada</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="aurora aurora-one"></div>
+    <div class="aurora aurora-two"></div>
+
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="For U">
+          <span class="brand-mark">▶</span>
+          <span>for u</span>
+        </a>
+        <div class="top-actions">
+          <select id="language" class="language" aria-label="Idioma">
+            <option value="pt">PT</option>
+            <option value="ru">RU</option>
+          </select>
+          <span id="connectionPill" class="pill"><i></i><span data-i18n="offline">Desconectado</span></span>
+        </div>
+      </header>
+
+      <section id="lobby" class="lobby panel">
+        <div class="lobby-copy">
+          <p class="eyebrow" data-i18n="privateRoom">SALA PRIVADA · 2 PESSOAS</p>
+          <h1 data-i18n="together">A distância fica menor quando vocês assistem juntos.</h1>
+          <p data-i18n="intro">Compartilhe uma aba, sua tela ou um arquivo reproduzido no computador. O áudio e o vídeo vão direto para a outra pessoa.</p>
+        </div>
+        <div class="lobby-actions">
+          <button id="createRoom" class="button primary">
+            <span class="button-icon">＋</span><span data-i18n="create">Criar uma sala</span>
+          </button>
+          <div class="divider"><span data-i18n="or">ou</span></div>
+          <form id="joinForm" class="join-form">
+            <label for="roomCode" data-i18n="haveCode">Já tem um código?</label>
+            <div class="join-row">
+              <input id="roomCode" maxlength="6" autocomplete="off" placeholder="A7K9Q2" aria-label="Código da sala" />
+              <button class="button secondary" type="submit" data-i18n="enter">Entrar</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="room" class="room hidden">
+        <div class="room-heading">
+          <div>
+            <p class="eyebrow" data-i18n="room">SALA</p>
+            <div class="room-code-line">
+              <h1 id="roomCodeLabel">------</h1>
+              <button id="copyLink" class="icon-button" title="Copiar link" aria-label="Copiar link">⧉</button>
+            </div>
+          </div>
+          <div class="presence">
+            <span><i id="hostDot"></i><span data-i18n="you">Você</span></span>
+            <span><i id="viewerDot"></i><span data-i18n="friend">Amiga</span></span>
+          </div>
+        </div>
+
+        <div class="workspace">
+          <section class="stage panel">
+            <video id="remoteVideo" autoplay playsinline controls></video>
+            <video id="localPreview" autoplay playsinline muted></video>
+            <div id="emptyStage" class="empty-stage">
+              <div class="signal-art"><span></span><span></span><span></span></div>
+              <h2 id="stageTitle" data-i18n="ready">Pronto para transmitir</h2>
+              <p id="stageDescription" data-i18n="chooseTab">Escolha uma aba com áudio para ter o melhor resultado.</p>
+              <button id="startShare" class="button primary"><span>▣</span><span data-i18n="share">Compartilhar aba ou tela</span></button>
+            </div>
+            <div class="stage-footer">
+              <span id="mediaStatus"><i></i><span data-i18n="waiting">Aguardando transmissão</span></span>
+              <button id="stopShare" class="button danger hidden" data-i18n="stop">Parar</button>
+            </div>
+          </section>
+
+          <aside class="chat panel">
+            <div class="chat-header">
+              <div><span>◌</span><h2 data-i18n="chat">Chat</h2></div>
+              <span id="peerStatus" data-i18n="waitingFriend">Aguardando amiga</span>
+            </div>
+            <div id="messages" class="messages">
+              <div class="system-message" data-i18n="secure">A sala é temporária. As mensagens desaparecem quando vocês saem.</div>
+            </div>
+            <form id="chatForm" class="chat-form">
+              <input id="chatInput" maxlength="500" autocomplete="off" data-i18n-placeholder="messagePlaceholder" placeholder="Escreva uma mensagem…" />
+              <button type="submit" aria-label="Enviar">➤</button>
+            </form>
+          </aside>
+        </div>
+
+        <div class="tip"><span>✦</span><p data-i18n="tip"><strong>Dica:</strong> no Chrome, escolha “Aba” e marque “Compartilhar áudio da aba”.</p></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

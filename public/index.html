@@ -4,20 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#090b12" />
-    <meta name="description" content="Sala privada para assistir e ouvir juntos." />
+    <meta name="description" content="With U — sala privada para assistir e ouvir juntos." />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237c5cff'/%3E%3Cpath d='M18 23h28v18H18z' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='m29 28 10 4-10 5z' fill='white'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <title>For U — Sala privada</title>
+    <title>With U — Sala privada</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <main class="shell">
       <header class="topbar">
-        <a class="brand" href="/" aria-label="For U">
+        <a class="brand" href="/" aria-label="With U">
           <span class="brand-mark" aria-hidden="true">▶</span>
-          <span>for u</span>
+          <span>with u</span>
         </a>
         <div class="top-actions">
           <select id="language" class="language" aria-label="Idioma">
@@ -92,6 +92,9 @@
             <video id="remoteVideo" autoplay playsinline controls></video>
             <audio id="remoteAudio" class="hidden" autoplay controls></audio>
             <video id="localPreview" autoplay playsinline muted></video>
+            <button id="resumePlayback" class="resume-playback button primary hidden" type="button">
+              <span aria-hidden="true">▶</span><span data-i18n="playStream">Reproduzir transmissão</span>
+            </button>
             <div id="emptyStage" class="empty-stage">
               <div class="signal-art"><span></span><span></span><span></span></div>
               <h2 id="stageTitle" data-i18n="ready">Pronto para transmitir</h2>

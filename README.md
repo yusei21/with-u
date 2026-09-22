@@ -37,6 +37,12 @@ The free translation service has a daily character quota. If translation is unav
 
 ## Production
 
-Screen sharing requires HTTPS outside `localhost`. Configure a TURN server in the `iceServers` array in `public/app.js` for reliable connections across restrictive NATs and firewalls; STUN alone cannot handle every network.
+Screen sharing requires HTTPS outside `localhost`. For reliable connections across restrictive NATs and firewalls, create a Metered Open Relay account and add this Render environment variable:
+
+```text
+METERED_TURN_API_URL=https://YOUR_APP.metered.live/api/v1/turn/credentials?apiKey=YOUR_API_KEY
+```
+
+The server retrieves short-lived `iceServers` credentials without exposing the API URL in the browser or repository. When the variable is absent or the provider is unavailable, the app falls back to Google STUN.
 
 This project does not bypass DRM. Only stream content you are authorized to share.

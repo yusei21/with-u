@@ -37,6 +37,12 @@ O tradutor gratuito possui cota diária. Se ficar indisponível, a mensagem orig
 
 ## Produção
 
-O compartilhamento exige HTTPS fora de `localhost`. Para conexões confiáveis em redes restritivas, configure um servidor TURN no array `iceServers` de `public/app.js`; somente STUN não funciona em todas as redes.
+O compartilhamento exige HTTPS fora de `localhost`. Para conexões confiáveis em redes restritivas, crie uma conta no Metered Open Relay e adicione esta variável de ambiente no Render:
+
+```text
+METERED_TURN_API_URL=https://SEU_APP.metered.live/api/v1/turn/credentials?apiKey=SUA_API_KEY
+```
+
+O servidor busca credenciais temporárias de `iceServers` sem expor a URL da API no navegador ou no repositório. Sem a variável, ou se o provedor estiver indisponível, o aplicativo volta a usar o STUN do Google.
 
 Este projeto não contorna DRM. Transmita apenas conteúdo autorizado.

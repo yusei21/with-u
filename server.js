@@ -202,5 +202,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, () => {
-  console.log(`For U disponível em http://localhost:${port}`);
+  console.log(`With U disponível em http://localhost:${port}`);
 });

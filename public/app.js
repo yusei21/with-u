@@ -14,11 +14,17 @@ const elements = {
 };
 
 const translations = {
-  pt: { offline: "Desconectado", online: "Conectado", privateRoom: "SALA PRIVADA · 2 PESSOAS", together: "Assistir juntos, mesmo de longe.", intro: "Crie uma sala privada, envie o convite e compartilhe uma aba, sua tela ou apenas o áudio.", create: "Criar uma sala", or: "ou", haveCode: "Entrar com código", enter: "Entrar", room: "SALA", you: "Transmissor", friend: "Convidada", invite: "Copiar convite", shareHeading: "O que você quer transmitir?", shareHelp: "Para o Spotify, abra o Web Player em uma aba e compartilhe com áudio.", ready: "Pronto para transmitir", chooseTab: "Escolha um modo acima e inicie quando estiver pronta.", modeScreenAudio: "Tela + áudio", modeScreenOnly: "Só tela", modeAudioOnly: "Só áudio", share: "Iniciar transmissão", waiting: "Aguardando transmissão", stop: "Parar", chat: "Chat", waitingFriend: "Aguardando convidada", friendOnline: "Convidada conectada", secure: "Tradução automática ativada: você recebe em português e ela em russo.", messagePlaceholder: "Escreva em português ou inglês…", tip: "<strong>Dica:</strong> no Chrome ou Brave, escolha “Aba” e ative “Compartilhar áudio da aba”.", linkCopied: "Convite copiado", joined: "Você entrou na sala", roleTaken: "Esta vaga já está ocupada", invalidCode: "Código inválido", sharing: "Transmitindo agora", receiving: "Recebendo transmissão", audioOnly: "Recebendo áudio", shareEnded: "A transmissão terminou", shareError: "Não foi possível compartilhar", noAudio: "Nenhum áudio foi selecionado", roomClosed: "A sala foi encerrada pelo transmissor", translated: "Traduzido", host: "Você", guest: "Convidada" },
+  pt: { offline: "Desconectado", online: "Conectado", privateRoom: "SALA PRIVADA · 2 PESSOAS", together: "Assistir juntos, mesmo de longe.", intro: "Crie uma sala privada, envie o convite e compartilhe uma aba, sua tela ou apenas o áudio.", create: "Criar uma sala", or: "ou", haveCode: "Entrar com código", enter: "Entrar", room: "SALA", you: "Transmissor", friend: "Convidada", invite: "Copiar convite", shareHeading: "O que você quer transmitir?", shareHelp: "Para o Spotify, abra o Web Player em uma aba e compartilhe com áudio.", ready: "Pronto para transmitir", chooseTab: "Escolha um modo acima e inicie quando estiver pronta.", modeScreenAudio: "Tela + áudio", modeScreenOnly: "Só tela", modeAudioOnly: "Só áudio", share: "Iniciar transmissão", waiting: "Aguardando transmissão", stop: "Parar", chat: "Chat", waitingFriend: "Aguardando convidada", friendOnline: "Convidada conectada", secure: "Tradução automática ativada: as mensagens chegam no idioma selecionado acima.", messagePlaceholder: "Escreva uma mensagem…", tip: "<strong>Dica:</strong> no Chrome ou Brave, escolha “Aba” e ative “Compartilhar áudio da aba”.", linkCopied: "Convite copiado", joined: "Você entrou na sala", roleTaken: "Esta vaga já está ocupada", invalidCode: "Código inválido", sharing: "Transmitindo agora", receiving: "Recebendo transmissão", audioOnly: "Recebendo áudio", shareEnded: "A transmissão terminou", shareError: "Não foi possível compartilhar", noAudio: "Nenhum áudio foi selecionado", roomClosed: "A sala foi encerrada pelo transmissor", translated: "Traduzido", host: "Você", guest: "Convidada" },
   ru: { offline: "Не подключено", online: "Подключено", privateRoom: "ПРИВАТНАЯ КОМНАТА · 2 ЧЕЛОВЕКА", together: "Смотрите вместе, даже на расстоянии.", intro: "Создайте приватную комнату, отправьте приглашение и поделитесь вкладкой, экраном или только звуком.", create: "Создать комнату", or: "или", haveCode: "Войти по коду", enter: "Войти", room: "КОМНАТА", you: "Ведущий", friend: "Гостья", invite: "Копировать приглашение", shareHeading: "Что вы хотите транслировать?", shareHelp: "Для Spotify откройте веб-плеер во вкладке и включите передачу звука.", ready: "Готово к трансляции", chooseTab: "Выберите режим выше и начните трансляцию.", modeScreenAudio: "Экран + звук", modeScreenOnly: "Только экран", modeAudioOnly: "Только звук", share: "Начать трансляцию", waiting: "Ожидание трансляции", stop: "Остановить", chat: "Чат", waitingFriend: "Ожидание гостьи", friendOnline: "Гостья подключена", secure: "Автоперевод включён: вы получаете сообщения на русском языке.", messagePlaceholder: "Напишите по-русски…", tip: "<strong>Совет:</strong> в Chrome или Brave выберите вкладку и включите передачу её звука.", linkCopied: "Приглашение скопировано", joined: "Вы вошли в комнату", roleTaken: "Это место уже занято", invalidCode: "Неверный код", sharing: "Идёт трансляция", waiting: "Ожидание трансляции", receiving: "Приём трансляции", audioOnly: "Приём аудио", shareEnded: "Трансляция завершена", shareError: "Не удалось поделиться", noAudio: "Звук не выбран", roomClosed: "Ведущий закрыл комнату", translated: "Переведено", host: "Вы", guest: "Гостья" },
+  en: { offline: "Offline", online: "Connected", privateRoom: "PRIVATE ROOM · 2 PEOPLE", together: "Watch together, even from far away.", intro: "Create a private room, send the invite, and share a tab, your screen, or audio only.", create: "Create a room", or: "or", haveCode: "Join with a code", enter: "Join", room: "ROOM", you: "Host", friend: "Guest", invite: "Copy invite", shareHeading: "What do you want to share?", shareHelp: "For Spotify, open the Web Player in a browser tab and share it with audio.", ready: "Ready to stream", chooseTab: "Choose a mode above and start when you are ready.", modeScreenAudio: "Screen + audio", modeScreenOnly: "Screen only", modeAudioOnly: "Audio only", share: "Start streaming", waiting: "Waiting for stream", stop: "Stop", chat: "Chat", waitingFriend: "Waiting for guest", friendOnline: "Guest connected", secure: "Automatic translation is on: messages arrive in your selected language.", messagePlaceholder: "Write a message…", tip: "<strong>Tip:</strong> in Chrome or Brave, choose “Tab” and enable “Share tab audio”.", linkCopied: "Invite copied", joined: "You joined the room", roleTaken: "This spot is already taken", invalidCode: "Invalid code", sharing: "Streaming now", receiving: "Receiving stream", audioOnly: "Receiving audio", shareEnded: "The stream has ended", shareError: "Could not start sharing", noAudio: "No audio was selected", roomClosed: "The host closed the room", translated: "Translated", host: "You", guest: "Guest" },
+  zh: { offline: "未连接", online: "已连接", privateRoom: "私人房间 · 2 人", together: "即使相隔很远，也能一起观看。", intro: "创建私人房间，发送邀请，并共享标签页、屏幕或仅共享音频。", create: "创建房间", or: "或", haveCode: "使用房间代码加入", enter: "加入", room: "房间", you: "主持人", friend: "访客", invite: "复制邀请", shareHeading: "您想共享什么？", shareHelp: "使用 Spotify 时，请在浏览器标签页打开网页版播放器并共享音频。", ready: "准备开始直播", chooseTab: "请在上方选择模式，然后开始直播。", modeScreenAudio: "屏幕和音频", modeScreenOnly: "仅屏幕", modeAudioOnly: "仅音频", share: "开始直播", waiting: "等待直播", stop: "停止", chat: "聊天", waitingFriend: "等待访客", friendOnline: "访客已连接", secure: "自动翻译已开启：消息将以您选择的语言显示。", messagePlaceholder: "输入消息…", tip: "<strong>提示：</strong>在 Chrome 或 Brave 中选择“标签页”，并启用“共享标签页音频”。", linkCopied: "邀请已复制", joined: "您已加入房间", roleTaken: "该位置已被占用", invalidCode: "房间代码无效", sharing: "正在直播", receiving: "正在接收直播", audioOnly: "正在接收音频", shareEnded: "直播已结束", shareError: "无法开始共享", noAudio: "未选择音频", roomClosed: "主持人已关闭房间", translated: "已翻译", host: "您", guest: "访客" },
 };
 
-let language = navigator.language.toLowerCase().startsWith("ru") ? "ru" : "pt";
+const browserLanguage = navigator.language.toLowerCase();
+let language = browserLanguage.startsWith("ru") ? "ru"
+  : browserLanguage.startsWith("zh") ? "zh"
+    : browserLanguage.startsWith("en") ? "en"
+      : "pt";
 let roomId = null;
 let role = null;
 let peer = null;
@@ -27,7 +33,7 @@ let presence = { host: false, viewer: false };
 
 const t = (key) => translations[language][key] || key;
 function applyLanguage() {
-  document.documentElement.lang = language === "ru" ? "ru" : "pt-BR";
+  document.documentElement.lang = { pt: "pt-BR", ru: "ru", en: "en", zh: "zh-CN" }[language];
   elements.language.value = language;
   document.querySelectorAll("[data-i18n]").forEach((node) => {
     const value = t(node.dataset.i18n);
@@ -56,7 +62,7 @@ function roomFromPath() {
 }
 
 function enterRoom(id, selectedRole) {
-  socket.emit("join-room", { roomId: id, role: selectedRole }, (result) => {
+  socket.emit("join-room", { roomId: id, role: selectedRole, language }, (result) => {
     if (!result?.ok) {
       showToast(t(result?.error === "role-taken" ? "roleTaken" : "invalidCode"));
       return;
@@ -229,7 +235,11 @@ elements.chatForm.addEventListener("submit", (event) => {
   socket.emit("chat", { roomId, text });
   elements.chatInput.value = "";
 });
-elements.language.addEventListener("change", () => { language = elements.language.value; applyLanguage(); });
+elements.language.addEventListener("change", () => {
+  language = elements.language.value;
+  applyLanguage();
+  if (roomId) socket.emit("update-language", { roomId, language });
+});
 
 socket.on("connect", () => {
   elements.connection.classList.add("connected");

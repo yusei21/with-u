@@ -72,6 +72,24 @@ function assertTranslated(original, translated) {
   return clean;
 }
 
+async function translateWithGoogle(text, target) {
+  const url = new URL("https://translate.googleapis.com/translate_a/single");
+  url.searchParams.set("client", "gtx");
+  url.searchParams.set("sl", "auto");
+  url.searchParams.set("tl", target);
+  url.searchParams.set("dt", "t");
+  url.searchParams.set("q", text);
+  const response = await fetch(url, { signal: AbortSignal.timeout(6000) });
+  if (!response.ok) throw new Error(`Google Translate failed: ${response.status}`);
+  const data = await response.json();
+  const translated = Array.isArray(data?.[0])
+    ? data[0].map((part) => part?.[0] || "").join("")
+    : "";
+  const clean = cleanTranslation(translated).trim();
+  if (!clean) throw new Error("Google Translate returned an empty response");
+  return clean;
+}
+
 async function translateWithMyMemory(text, source, target) {
   const url = new URL("https://api.mymemory.translated.net/get");
   url.searchParams.set("q", text);
@@ -101,6 +119,12 @@ async function translateWithLibreTranslate(endpoint, text, source, target) {
 }
 
 async function translateMessage(text, source, target) {
+  try {
+    return await translateWithGoogle(text, target);
+  } catch (googleError) {
+    console.warn("Google Translate unavailable", googleError.message);
+  }
+
   if (source === target) return text;
   try {
     return await translateWithMyMemory(text, source, target);

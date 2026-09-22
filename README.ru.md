@@ -37,6 +37,12 @@ npm run dev
 
 ## Продакшен
 
-Вне `localhost` требуется HTTPS. Для надёжной связи через строгие NAT и межсетевые экраны настройте TURN-сервер в `iceServers` файла `public/app.js`; одного STUN недостаточно.
+Вне `localhost` требуется HTTPS. Для надёжной связи создайте учётную запись Metered Open Relay и добавьте в Render переменную окружения:
+
+```text
+METERED_TURN_API_URL=https://YOUR_APP.metered.live/api/v1/turn/credentials?apiKey=YOUR_API_KEY
+```
+
+Сервер получает временные данные `iceServers`, не раскрывая URL API в браузере или репозитории. Если переменная отсутствует, приложение использует Google STUN.
 
 Проект не обходит DRM. Транслируйте только разрешённый контент.

@@ -5,15 +5,17 @@ const elements = {
   lobby: $("#lobby"), room: $("#room"), create: $("#createRoom"), joinForm: $("#joinForm"),
   roomInput: $("#roomCode"), roomLabel: $("#roomCodeLabel"), copy: $("#copyLink"),
   start: $("#startShare"), stop: $("#stopShare"), local: $("#localPreview"), remote: $("#remoteVideo"),
+  remoteAudio: $("#remoteAudio"),
   empty: $("#emptyStage"), media: $("#mediaStatus"), stage: $(".stage-footer"),
   connection: $("#connectionPill"), hostDot: $("#hostDot"), viewerDot: $("#viewerDot"),
   peerStatus: $("#peerStatus"), chatForm: $("#chatForm"), chatInput: $("#chatInput"),
   messages: $("#messages"), language: $("#language"), toast: $("#toast"),
+  shareControls: $("#shareControls"), leave: $("#leaveRoom"), roleBadge: $("#roleBadge"),
 };
 
 const translations = {
-  pt: { offline: "Desconectado", online: "Conectado", privateRoom: "SALA PRIVADA · 2 PESSOAS", together: "A distância fica menor quando vocês assistem juntos.", intro: "Compartilhe uma aba, sua tela ou um arquivo reproduzido no computador. O áudio e o vídeo vão direto para a outra pessoa.", create: "Criar uma sala", or: "ou", haveCode: "Já tem um código?", enter: "Entrar", room: "SALA", you: "Você", friend: "Amiga", ready: "Pronto para transmitir", chooseTab: "Escolha uma aba com áudio para ter o melhor resultado.", share: "Compartilhar aba ou tela", waiting: "Aguardando transmissão", stop: "Parar", chat: "Chat", waitingFriend: "Aguardando amiga", friendOnline: "Amiga conectada", secure: "A sala é temporária. As mensagens desaparecem quando vocês saem.", messagePlaceholder: "Escreva uma mensagem…", tip: "<strong>Dica:</strong> no Chrome, escolha “Aba” e marque “Compartilhar áudio da aba”.", linkCopied: "Link copiado", joined: "Você entrou na sala", roleTaken: "Esta vaga já está ocupada", invalidCode: "Código inválido", sharing: "Transmitindo agora", receiving: "Recebendo transmissão", shareEnded: "A transmissão terminou", shareError: "Não foi possível compartilhar", host: "Você", guest: "Amiga" },
-  ru: { offline: "Не подключено", online: "Подключено", privateRoom: "ПРИВАТНАЯ КОМНАТА · 2 ЧЕЛОВЕКА", together: "Расстояние меньше, когда вы смотрите вместе.", intro: "Поделитесь вкладкой, экраном или файлом на компьютере. Аудио и видео передаются напрямую другому человеку.", create: "Создать комнату", or: "или", haveCode: "Уже есть код?", enter: "Войти", room: "КОМНАТА", you: "Вы", friend: "Подруга", ready: "Готово к трансляции", chooseTab: "Для лучшего результата выберите вкладку со звуком.", share: "Поделиться экраном", waiting: "Ожидание трансляции", stop: "Остановить", chat: "Чат", waitingFriend: "Ожидание подруги", friendOnline: "Подруга подключена", secure: "Комната временная. Сообщения исчезнут, когда вы выйдете.", messagePlaceholder: "Напишите сообщение…", tip: "<strong>Совет:</strong> в Chrome выберите «Вкладка» и включите передачу звука.", linkCopied: "Ссылка скопирована", joined: "Вы вошли в комнату", roleTaken: "Это место уже занято", invalidCode: "Неверный код", sharing: "Идёт трансляция", receiving: "Приём трансляции", shareEnded: "Трансляция завершена", shareError: "Не удалось поделиться", host: "Вы", guest: "Подруга" },
+  pt: { offline: "Desconectado", online: "Conectado", privateRoom: "SALA PRIVADA · 2 PESSOAS", together: "Assistir juntos, mesmo de longe.", intro: "Crie uma sala privada, envie o convite e compartilhe uma aba, sua tela ou apenas o áudio.", create: "Criar uma sala", or: "ou", haveCode: "Entrar com código", enter: "Entrar", room: "SALA", you: "Transmissor", friend: "Convidada", invite: "Copiar convite", shareHeading: "O que você quer transmitir?", shareHelp: "Para o Spotify, abra o Web Player em uma aba e compartilhe com áudio.", ready: "Pronto para transmitir", chooseTab: "Escolha um modo acima e inicie quando estiver pronta.", modeScreenAudio: "Tela + áudio", modeScreenOnly: "Só tela", modeAudioOnly: "Só áudio", share: "Iniciar transmissão", waiting: "Aguardando transmissão", stop: "Parar", chat: "Chat", waitingFriend: "Aguardando convidada", friendOnline: "Convidada conectada", secure: "Sala temporária: as mensagens desaparecem quando vocês saem.", messagePlaceholder: "Escreva uma mensagem…", tip: "<strong>Dica:</strong> no Chrome ou Brave, escolha “Aba” e ative “Compartilhar áudio da aba”.", linkCopied: "Convite copiado", joined: "Você entrou na sala", roleTaken: "Esta vaga já está ocupada", invalidCode: "Código inválido", sharing: "Transmitindo agora", receiving: "Recebendo transmissão", audioOnly: "Recebendo áudio", shareEnded: "A transmissão terminou", shareError: "Não foi possível compartilhar", noAudio: "Nenhum áudio foi selecionado", host: "Você", guest: "Convidada" },
+  ru: { offline: "Не подключено", online: "Подключено", privateRoom: "ПРИВАТНАЯ КОМНАТА · 2 ЧЕЛОВЕКА", together: "Смотрите вместе, даже на расстоянии.", intro: "Создайте приватную комнату, отправьте приглашение и поделитесь вкладкой, экраном или только звуком.", create: "Создать комнату", or: "или", haveCode: "Войти по коду", enter: "Войти", room: "КОМНАТА", you: "Ведущий", friend: "Гостья", invite: "Копировать приглашение", shareHeading: "Что вы хотите транслировать?", shareHelp: "Для Spotify откройте веб-плеер во вкладке и включите передачу звука.", ready: "Готово к трансляции", chooseTab: "Выберите режим выше и начните трансляцию.", modeScreenAudio: "Экран + звук", modeScreenOnly: "Только экран", modeAudioOnly: "Только звук", share: "Начать трансляцию", waiting: "Ожидание трансляции", stop: "Остановить", chat: "Чат", waitingFriend: "Ожидание гостьи", friendOnline: "Гостья подключена", secure: "Комната временная: сообщения исчезнут после выхода.", messagePlaceholder: "Напишите сообщение…", tip: "<strong>Совет:</strong> в Chrome или Brave выберите вкладку и включите передачу её звука.", linkCopied: "Приглашение скопировано", joined: "Вы вошли в комнату", roleTaken: "Это место уже занято", invalidCode: "Неверный код", sharing: "Идёт трансляция", receiving: "Приём трансляции", audioOnly: "Приём аудио", shareEnded: "Трансляция завершена", shareError: "Не удалось поделиться", noAudio: "Звук не выбран", host: "Вы", guest: "Гостья" },
 };
 
 let language = navigator.language.toLowerCase().startsWith("ru") ? "ru" : "pt";
@@ -65,8 +67,10 @@ function enterRoom(id, selectedRole) {
     elements.roomLabel.textContent = roomId;
     elements.lobby.classList.add("hidden");
     elements.room.classList.remove("hidden");
+    document.body.dataset.role = role;
+    elements.roleBadge.textContent = role === "host" ? "HOST" : "VIEWER";
     if (role === "viewer") {
-      elements.start.classList.add("hidden");
+      elements.shareControls.classList.add("hidden");
       $("#stageTitle").textContent = t("waiting");
       $("#stageDescription").textContent = t("waitingFriend");
     }
@@ -97,11 +101,15 @@ function createPeer() {
     elements.connection.classList.toggle("connected", connected || socket.connected);
   };
   peer.ontrack = ({ streams }) => {
-    elements.remote.srcObject = streams[0];
-    elements.remote.classList.remove("hidden");
+    const incoming = streams[0];
+    const hasVideo = incoming.getVideoTracks().length > 0;
+    elements.remote.srcObject = hasVideo ? incoming : null;
+    elements.remoteAudio.srcObject = hasVideo ? null : incoming;
+    elements.remote.classList.toggle("hidden", !hasVideo);
+    elements.remoteAudio.classList.toggle("hidden", hasVideo);
     elements.empty.classList.add("hidden");
     elements.stage.classList.add("live");
-    elements.media.querySelector("span").textContent = t("receiving");
+    elements.media.querySelector("span").textContent = t(hasVideo ? "receiving" : "audioOnly");
   };
   return peer;
 }
@@ -137,14 +145,16 @@ async function handleSignal(payload) {
 
 async function startSharing() {
   try {
-    stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: true });
-    elements.local.srcObject = stream;
-    elements.local.style.display = "block";
+    const mode = document.querySelector("input[name='shareMode']:checked")?.value || "screen-audio";
+    stream = await getSharingStream(mode);
+    const hasVideo = stream.getVideoTracks().length > 0;
+    elements.local.srcObject = hasVideo ? stream : null;
+    elements.local.style.display = hasVideo ? "block" : "none";
     elements.empty.classList.add("hidden");
     elements.stop.classList.remove("hidden");
     elements.stage.classList.add("live");
     elements.media.querySelector("span").textContent = t("sharing");
-    stream.getVideoTracks()[0].addEventListener("ended", stopSharing);
+    stream.getTracks().forEach((track) => track.addEventListener("ended", stopSharing, { once: true }));
     if (presence.viewer) await makeOffer();
   } catch (error) {
     if (error.name !== "NotAllowedError") console.error(error);
@@ -152,10 +162,33 @@ async function startSharing() {
   }
 }
 
+async function getSharingStream(mode) {
+  if (mode === "screen-only") {
+    return navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: false });
+  }
+
+  if (mode === "audio-only") {
+    try {
+      const displayStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      displayStream.getVideoTracks().forEach((track) => track.stop());
+      const audioTracks = displayStream.getAudioTracks();
+      if (audioTracks.length > 0) return new MediaStream(audioTracks);
+      showToast(t("noAudio"));
+    } catch (error) {
+      if (error.name === "NotAllowedError") throw error;
+    }
+    return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+  }
+
+  return navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: true });
+}
+
 function resetMedia(status = t("waiting")) {
   peer?.close(); peer = null;
   elements.remote.srcObject = null;
   elements.remote.classList.add("hidden");
+  elements.remoteAudio.srcObject = null;
+  elements.remoteAudio.classList.add("hidden");
   elements.local.style.display = "none";
   elements.empty.classList.remove("hidden");
   elements.stop.classList.add("hidden");
@@ -184,6 +217,10 @@ elements.stop.addEventListener("click", stopSharing);
 elements.copy.addEventListener("click", async () => {
   await navigator.clipboard.writeText(location.href);
   showToast(t("linkCopied"));
+});
+elements.leave.addEventListener("click", () => {
+  stream?.getTracks().forEach((track) => track.stop());
+  location.href = "/";
 });
 elements.chatForm.addEventListener("submit", (event) => {
   event.preventDefault();

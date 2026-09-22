@@ -16,6 +16,11 @@ app.get("/room/:roomId", (_request, response) => {
 });
 
 const rooms = new Map();
+const supportedLanguages = new Set(["pt", "ru", "en", "zh"]);
+
+function translationCode(language) {
+  return language === "zh" ? "zh-CN" : language;
+}
 
 function detectLatinLanguage(text) {
   const normalized = ` ${text.toLowerCase().replace(/[^a-zà-ÿ']/g, " ").replace(/\s+/g, " ")} `;
@@ -24,6 +29,12 @@ function detectLatinLanguage(text) {
   const ptScore = portuguese.filter((word) => normalized.includes(word)).length + (/[ãõáéíóúâêôç]/i.test(text) ? 2 : 0);
   const enScore = english.filter((word) => normalized.includes(word)).length;
   return enScore > ptScore ? "en" : "pt";
+}
+
+function detectLanguage(text) {
+  if (/\p{Script=Cyrillic}/u.test(text)) return "ru";
+  if (/\p{Script=Han}/u.test(text)) return "zh-CN";
+  return detectLatinLanguage(text);
 }
 
 async function translateMessage(text, source, target) {
@@ -44,7 +55,11 @@ async function translateMessage(text, source, target) {
 }
 
 function roomState(roomId) {
-  if (!rooms.has(roomId)) rooms.set(roomId, { host: null, viewer: null });
+  if (!rooms.has(roomId)) rooms.set(roomId, {
+    host: null,
+    viewer: null,
+    languages: { host: "pt", viewer: "ru" },
+  });
   return rooms.get(roomId);
 }
 
@@ -58,7 +73,7 @@ function emitPresence(roomId) {
 }
 
 io.on("connection", (socket) => {
-  socket.on("join-room", ({ roomId, role }, acknowledge) => {
+  socket.on("join-room", ({ roomId, role, language }, acknowledge) => {
     if (!/^[A-Z0-9]{6}$/.test(roomId) || !["host", "viewer"].includes(role)) {
       acknowledge?.({ ok: false, error: "invalid-room" });
       return;
@@ -71,12 +86,22 @@ io.on("connection", (socket) => {
     }
 
     room[role] = socket.id;
+    room.languages[role] = supportedLanguages.has(language) ? language : (role === "host" ? "pt" : "ru");
     socket.data.roomId = roomId;
     socket.data.role = role;
+    socket.data.language = room.languages[role];
     socket.join(roomId);
     acknowledge?.({ ok: true });
     emitPresence(roomId);
     socket.to(roomId).emit("peer-ready", { role });
+  });
+
+  socket.on("update-language", ({ roomId, language }) => {
+    const { role } = socket.data;
+    const room = rooms.get(roomId);
+    if (!room || room[role] !== socket.id || !supportedLanguages.has(language)) return;
+    room.languages[role] = language;
+    socket.data.language = language;
   });
 
   socket.on("signal", ({ roomId, payload }) => {
@@ -90,10 +115,9 @@ io.on("connection", (socket) => {
     const room = rooms.get(roomId);
     if (!room) return;
 
-    const source = socket.data.role === "viewer"
-      ? (/\p{Script=Cyrillic}/u.test(cleanText) ? "ru" : detectLatinLanguage(cleanText))
-      : detectLatinLanguage(cleanText);
-    const target = socket.data.role === "host" ? "ru" : "pt";
+    const source = detectLanguage(cleanText);
+    const recipientRole = socket.data.role === "host" ? "viewer" : "host";
+    const target = translationCode(room.languages[recipientRole]);
     let translatedText = cleanText;
     let translated = false;
     try {
@@ -109,7 +133,7 @@ io.on("connection", (socket) => {
       sentAt: new Date().toISOString(),
     };
     socket.emit("chat", { ...baseMessage, text: cleanText, translated: false });
-    const recipientId = socket.data.role === "host" ? room.viewer : room.host;
+    const recipientId = room[recipientRole];
     if (recipientId) io.to(recipientId).emit("chat", { ...baseMessage, text: translatedText, translated });
   });
 

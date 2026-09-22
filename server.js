@@ -11,6 +11,24 @@ const port = Number(process.env.PORT || 3000);
 const directory = path.dirname(fileURLToPath(import.meta.url));
 
 app.use(express.static(path.join(directory, "public")));
+app.get("/api/turn-credentials", async (_request, response) => {
+  const credentialsUrl = process.env.METERED_TURN_API_URL;
+  if (!credentialsUrl) {
+    response.status(503).json({ error: "TURN is not configured" });
+    return;
+  }
+
+  try {
+    const turnResponse = await fetch(credentialsUrl, { signal: AbortSignal.timeout(7000) });
+    if (!turnResponse.ok) throw new Error(`TURN provider returned ${turnResponse.status}`);
+    const iceServers = await turnResponse.json();
+    if (!Array.isArray(iceServers) || iceServers.length === 0) throw new Error("Invalid TURN response");
+    response.set("cache-control", "no-store").json(iceServers);
+  } catch (error) {
+    console.warn("TURN credentials unavailable", error.message);
+    response.status(502).json({ error: "TURN credentials unavailable" });
+  }
+});
 app.get("/room/:roomId", (_request, response) => {
   response.sendFile(path.join(directory, "public", "index.html"));
 });

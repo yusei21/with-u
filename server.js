@@ -17,6 +17,32 @@ app.get("/room/:roomId", (_request, response) => {
 
 const rooms = new Map();
 
+function detectLatinLanguage(text) {
+  const normalized = ` ${text.toLowerCase().replace(/[^a-zà-ÿ']/g, " ").replace(/\s+/g, " ")} `;
+  const portuguese = [" de ", " que ", " não ", " para ", " você ", " eu ", " uma ", " com ", " como ", " estou ", " meu ", " minha ", " oi ", " tudo ", " bem "];
+  const english = [" the ", " you ", " are ", " is ", " to ", " and ", " with ", " how ", " i ", " my ", " hello ", " hi ", " this ", " what ", " good ", " morning ", " night ", " thanks ", " love ", " miss ", " yes ", " no ", " please ", " sorry "];
+  const ptScore = portuguese.filter((word) => normalized.includes(word)).length + (/[ãõáéíóúâêôç]/i.test(text) ? 2 : 0);
+  const enScore = english.filter((word) => normalized.includes(word)).length;
+  return enScore > ptScore ? "en" : "pt";
+}
+
+async function translateMessage(text, source, target) {
+  if (source === target) return text;
+  const url = new URL("https://api.mymemory.translated.net/get");
+  url.searchParams.set("q", text);
+  url.searchParams.set("langpair", `${source}|${target}`);
+  const response = await fetch(url, { signal: AbortSignal.timeout(7000) });
+  if (!response.ok) throw new Error(`Translation failed: ${response.status}`);
+  const data = await response.json();
+  if (!data?.responseData?.translatedText) throw new Error("Translation returned no text");
+  return data.responseData.translatedText
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
 function roomState(roomId) {
   if (!rooms.has(roomId)) rooms.set(roomId, { host: null, viewer: null });
   return rooms.get(roomId);
@@ -57,26 +83,48 @@ io.on("connection", (socket) => {
     if (socket.data.roomId === roomId) socket.to(roomId).emit("signal", payload);
   });
 
-  socket.on("chat", ({ roomId, text }) => {
+  socket.on("chat", async ({ roomId, text }) => {
     if (socket.data.roomId !== roomId || typeof text !== "string") return;
-    const cleanText = text.trim().slice(0, 500);
+    const cleanText = text.trim().slice(0, 300);
     if (!cleanText) return;
-    io.to(roomId).emit("chat", {
+    const room = rooms.get(roomId);
+    if (!room) return;
+
+    const source = socket.data.role === "viewer"
+      ? (/\p{Script=Cyrillic}/u.test(cleanText) ? "ru" : detectLatinLanguage(cleanText))
+      : detectLatinLanguage(cleanText);
+    const target = socket.data.role === "host" ? "ru" : "pt";
+    let translatedText = cleanText;
+    let translated = false;
+    try {
+      translatedText = await translateMessage(cleanText, source, target);
+      translated = translatedText !== cleanText;
+    } catch (error) {
+      console.warn("Translation unavailable", error.message);
+    }
+
+    const baseMessage = {
       id: `${Date.now()}-${socket.id}`,
       sender: socket.data.role,
-      text: cleanText,
       sentAt: new Date().toISOString(),
-    });
+    };
+    socket.emit("chat", { ...baseMessage, text: cleanText, translated: false });
+    const recipientId = socket.data.role === "host" ? room.viewer : room.host;
+    if (recipientId) io.to(recipientId).emit("chat", { ...baseMessage, text: translatedText, translated });
   });
 
   socket.on("disconnect", () => {
     const { roomId, role } = socket.data;
     const room = rooms.get(roomId);
     if (!room || room[role] !== socket.id) return;
-    room[role] = null;
+    if (role === "host") {
+      socket.to(roomId).emit("room-closed");
+      rooms.delete(roomId);
+      return;
+    }
+    room.viewer = null;
     socket.to(roomId).emit("peer-left", { role });
-    if (!room.host && !room.viewer) rooms.delete(roomId);
-    else emitPresence(roomId);
+    emitPresence(roomId);
   });
 });
 

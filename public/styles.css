@@ -97,6 +97,7 @@ input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(118,87,246
 .message { max-width: 88%; }
 .message.mine { align-self: flex-end; }
 .message span { display: block; color: #777c8b; font-size: .61rem; margin: 0 0 4px 3px; }
+.message:not(.mine) span { color: #a991ff; }
 .message p { margin: 0; padding: 9px 11px; background: var(--surface-3); border-radius: 8px 8px 8px 2px; line-height: 1.45; font-size: .8rem; overflow-wrap: anywhere; }
 .message.mine p { background: var(--accent); border-radius: 8px 8px 2px 8px; }
 .chat-form { min-height: 62px; border-top: 1px solid var(--line); padding: 9px; display: flex; gap: 7px; }

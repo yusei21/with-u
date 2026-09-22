@@ -31,6 +31,26 @@ let role = null;
 let peer = null;
 let stream = null;
 let presence = { host: false, viewer: false };
+let iceServersPromise = null;
+let pendingCandidates = [];
+
+const fallbackIceServers = [
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" },
+];
+
+async function getIceServers() {
+  if (!iceServersPromise) {
+    iceServersPromise = fetch("/api/turn-credentials")
+      .then((response) => {
+        if (!response.ok) throw new Error("TURN unavailable");
+        return response.json();
+      })
+      .then((servers) => Array.isArray(servers) && servers.length ? servers : fallbackIceServers)
+      .catch(() => fallbackIceServers);
+  }
+  return iceServersPromise;
+}
 
 const t = (key) => translations[language][key] || key;
 function applyLanguage() {
@@ -63,6 +83,7 @@ function roomFromPath() {
 }
 
 function enterRoom(id, selectedRole) {
+  getIceServers();
   socket.emit("join-room", { roomId: id, role: selectedRole, language }, (result) => {
     if (!result?.ok) {
       showToast(t(result?.error === "role-taken" ? "roleTaken" : "invalidCode"));
@@ -92,13 +113,11 @@ function updatePresence(state) {
   elements.peerStatus.textContent = state.viewer ? t("friendOnline") : t("waitingFriend");
 }
 
-function createPeer() {
+async function createPeer() {
   peer?.close();
+  const iceServers = await getIceServers();
   peer = new RTCPeerConnection({
-    iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
-      { urls: "stun:stun1.l.google.com:19302" },
-    ],
+    iceServers,
   });
   peer.onicecandidate = ({ candidate }) => {
     if (candidate) socket.emit("signal", { roomId, payload: { type: "candidate", candidate } });
@@ -130,7 +149,8 @@ function createPeer() {
 
 async function makeOffer() {
   if (!stream || role !== "host") return;
-  const connection = createPeer();
+  pendingCandidates = [];
+  const connection = await createPeer();
   stream.getTracks().forEach((track) => connection.addTrack(track, stream));
   const offer = await connection.createOffer();
   await connection.setLocalDescription(offer);
@@ -140,21 +160,31 @@ async function makeOffer() {
 async function handleSignal(payload) {
   try {
     if (payload.type === "offer" && role === "viewer") {
-      const connection = createPeer();
+      const connection = await createPeer();
       await connection.setRemoteDescription(payload.description);
+      await flushPendingCandidates();
       const answer = await connection.createAnswer();
       await connection.setLocalDescription(answer);
       socket.emit("signal", { roomId, payload: { type: "answer", description: answer } });
     } else if (payload.type === "answer" && peer) {
       await peer.setRemoteDescription(payload.description);
-    } else if (payload.type === "candidate" && peer) {
-      await peer.addIceCandidate(payload.candidate);
+      await flushPendingCandidates();
+    } else if (payload.type === "candidate") {
+      if (peer?.remoteDescription) await peer.addIceCandidate(payload.candidate);
+      else pendingCandidates.push(payload.candidate);
     } else if (payload.type === "stopped") {
       resetMedia(t("shareEnded"));
     }
   } catch (error) {
     console.error("WebRTC signal error", error);
   }
+}
+
+async function flushPendingCandidates() {
+  if (!peer?.remoteDescription || pendingCandidates.length === 0) return;
+  const candidates = pendingCandidates;
+  pendingCandidates = [];
+  for (const candidate of candidates) await peer.addIceCandidate(candidate);
 }
 
 async function startSharing() {
@@ -204,6 +234,7 @@ async function getSharingStream(mode) {
 
 function resetMedia(status = t("waiting")) {
   peer?.close(); peer = null;
+  pendingCandidates = [];
   elements.remote.srcObject = null;
   elements.remote.classList.add("hidden");
   elements.remoteAudio.srcObject = null;

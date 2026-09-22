@@ -37,6 +37,12 @@ npm run dev
 
 ## 生产环境
 
-在 `localhost` 之外共享屏幕需要 HTTPS。为了在严格 NAT 或防火墙网络中可靠连接，请在 `public/app.js` 的 `iceServers` 中配置 TURN 服务器；仅使用 STUN 无法覆盖所有网络。
+在 `localhost` 之外共享屏幕需要 HTTPS。为了在严格的 NAT 或防火墙网络中可靠连接，请创建 Metered Open Relay 帐户，并在 Render 中添加以下环境变量：
+
+```text
+METERED_TURN_API_URL=https://YOUR_APP.metered.live/api/v1/turn/credentials?apiKey=YOUR_API_KEY
+```
+
+服务器会获取临时 `iceServers` 凭据，不会在浏览器或代码仓库中暴露 API URL。如果未配置该变量，应用将使用 Google STUN。
 
 本项目不会绕过 DRM。请仅共享您有权传播的内容。

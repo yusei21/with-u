@@ -1,27 +1,42 @@
 # For U
 
-Sala privada de transmissão para duas pessoas. O host compartilha uma aba, janela ou tela com áudio; a outra pessoa assiste no navegador. A mídia é enviada por WebRTC e o servidor cuida apenas da sala, do chat e da negociação da conexão.
+[English](README.md) | [Português](README.pt-BR.md) | [Русский](README.ru.md) | [简体中文](README.zh-CN.md)
 
-## Executar localmente
+A private two-person room for sharing a browser tab, screen, or audio. Media travels directly between participants over WebRTC; the Node.js server manages room presence, signaling, chat, and automatic message translation.
 
-Requer Node.js 20 ou mais recente.
+## Features
+
+- Private rooms with six-character invite codes
+- Screen with audio, screen only, and audio-only modes
+- Temporary real-time chat
+- Automatic translation based on each participant's language selector
+- Portuguese, Russian, English, and Simplified Chinese interface
+- Responsive desktop and mobile layout
+- Host-owned rooms that close when the host leaves
+
+## Run locally
+
+Requires Node.js 20 or newer.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abra `http://localhost:3000`, crie uma sala e envie o link para a outra pessoa.
+Open `http://localhost:3000`, create a room, and send the invite link to the other person.
 
-## Como usar
+## How to use
 
-1. Clique em **Criar uma sala**.
-2. Copie o link e envie para sua amiga.
-3. Quando ela entrar, clique em **Compartilhar aba ou tela**.
-4. No Chrome, selecione a aba desejada e marque **Compartilhar áudio da aba**.
+1. Select the language in which you want to receive chat messages.
+2. Click **Create a room** and copy the invite link.
+3. After the guest joins, choose **Screen + audio**, **Screen only**, or **Audio only**.
+4. Click **Start streaming**.
+5. For tab audio in Chrome or Brave, select **Tab** and enable **Share tab audio**.
 
-## Produção
+The free translation service has a daily character quota. If translation is unavailable, the original message is delivered instead. Chat text is sent to the external translation provider for processing.
 
-O compartilhamento de tela exige HTTPS fora de `localhost`. Para conexões entre redes ou países diferentes, configure um servidor TURN e acrescente suas credenciais em `iceServers` dentro de `public/app.js`; STUN sozinho não atravessa todos os tipos de NAT e firewall.
+## Production
 
-Este projeto não contorna DRM. Transmita apenas conteúdo que você tenha autorização para compartilhar.
+Screen sharing requires HTTPS outside `localhost`. Configure a TURN server in the `iceServers` array in `public/app.js` for reliable connections across restrictive NATs and firewalls; STUN alone cannot handle every network.
+
+This project does not bypass DRM. Only stream content you are authorized to share.

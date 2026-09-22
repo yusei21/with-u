@@ -13,13 +13,10 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="aurora aurora-one"></div>
-    <div class="aurora aurora-two"></div>
-
     <main class="shell">
       <header class="topbar">
         <a class="brand" href="/" aria-label="For U">
-          <span class="brand-mark">▶</span>
+          <span class="brand-mark" aria-hidden="true">▶</span>
           <span>for u</span>
         </a>
         <div class="top-actions">
@@ -31,13 +28,13 @@
         </div>
       </header>
 
-      <section id="lobby" class="lobby panel">
+      <section id="lobby" class="lobby">
         <div class="lobby-copy">
           <p class="eyebrow" data-i18n="privateRoom">SALA PRIVADA · 2 PESSOAS</p>
           <h1 data-i18n="together">A distância fica menor quando vocês assistem juntos.</h1>
           <p data-i18n="intro">Compartilhe uma aba, sua tela ou um arquivo reproduzido no computador. O áudio e o vídeo vão direto para a outra pessoa.</p>
         </div>
-        <div class="lobby-actions">
+        <div class="lobby-actions panel">
           <button id="createRoom" class="button primary">
             <span class="button-icon">＋</span><span data-i18n="create">Criar uma sala</span>
           </button>
@@ -54,28 +51,49 @@
 
       <section id="room" class="room hidden">
         <div class="room-heading">
-          <div>
+          <div class="room-identity">
             <p class="eyebrow" data-i18n="room">SALA</p>
             <div class="room-code-line">
               <h1 id="roomCodeLabel">------</h1>
-              <button id="copyLink" class="icon-button" title="Copiar link" aria-label="Copiar link">⧉</button>
+              <span id="roleBadge" class="role-badge">HOST</span>
             </div>
           </div>
-          <div class="presence">
-            <span><i id="hostDot"></i><span data-i18n="you">Você</span></span>
-            <span><i id="viewerDot"></i><span data-i18n="friend">Amiga</span></span>
+          <div class="room-actions">
+            <div class="presence">
+              <span><i id="hostDot"></i><span data-i18n="you">Você</span></span>
+              <span><i id="viewerDot"></i><span data-i18n="friend">Amiga</span></span>
+            </div>
+            <button id="copyLink" class="button invite-button" title="Copiar link">
+              <span aria-hidden="true">⧉</span><span data-i18n="invite">Copiar convite</span>
+            </button>
+            <button id="leaveRoom" class="icon-button" title="Sair da sala" aria-label="Sair da sala">×</button>
           </div>
         </div>
+
+        <section id="shareControls" class="share-controls panel">
+          <div class="share-copy">
+            <strong data-i18n="shareHeading">O que você quer transmitir?</strong>
+            <span data-i18n="shareHelp">Para o Spotify, abra o Web Player em uma aba e compartilhe com áudio.</span>
+          </div>
+          <div class="share-actions">
+            <div class="share-modes" role="radiogroup" aria-label="Modo de transmissão">
+              <label><input type="radio" name="shareMode" value="screen-audio" checked /><span data-i18n="modeScreenAudio">Tela + áudio</span></label>
+              <label><input type="radio" name="shareMode" value="screen-only" /><span data-i18n="modeScreenOnly">Só tela</span></label>
+              <label><input type="radio" name="shareMode" value="audio-only" /><span data-i18n="modeAudioOnly">Só áudio</span></label>
+            </div>
+            <button id="startShare" class="button primary"><span aria-hidden="true">▣</span><span data-i18n="share">Iniciar transmissão</span></button>
+          </div>
+        </section>
 
         <div class="workspace">
           <section class="stage panel">
             <video id="remoteVideo" autoplay playsinline controls></video>
+            <audio id="remoteAudio" class="hidden" autoplay controls></audio>
             <video id="localPreview" autoplay playsinline muted></video>
             <div id="emptyStage" class="empty-stage">
               <div class="signal-art"><span></span><span></span><span></span></div>
               <h2 id="stageTitle" data-i18n="ready">Pronto para transmitir</h2>
               <p id="stageDescription" data-i18n="chooseTab">Escolha uma aba com áudio para ter o melhor resultado.</p>
-              <button id="startShare" class="button primary"><span>▣</span><span data-i18n="share">Compartilhar aba ou tela</span></button>
             </div>
             <div class="stage-footer">
               <span id="mediaStatus"><i></i><span data-i18n="waiting">Aguardando transmissão</span></span>

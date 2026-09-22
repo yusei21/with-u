@@ -37,21 +37,63 @@ function detectLanguage(text) {
   return detectLatinLanguage(text);
 }
 
-async function translateMessage(text, source, target) {
-  if (source === target) return text;
-  const url = new URL("https://api.mymemory.translated.net/get");
-  url.searchParams.set("q", text);
-  url.searchParams.set("langpair", `${source}|${target}`);
-  const response = await fetch(url, { signal: AbortSignal.timeout(7000) });
-  if (!response.ok) throw new Error(`Translation failed: ${response.status}`);
-  const data = await response.json();
-  if (!data?.responseData?.translatedText) throw new Error("Translation returned no text");
-  return data.responseData.translatedText
+function cleanTranslation(text) {
+  return text
     .replace(/&#39;/g, "'")
     .replace(/&quot;/g, '"')
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">");
+}
+
+function assertTranslated(original, translated) {
+  const clean = cleanTranslation(translated || "").trim();
+  if (!clean || clean.localeCompare(original.trim(), undefined, { sensitivity: "accent" }) === 0) {
+    throw new Error("Provider returned the original text");
+  }
+  return clean;
+}
+
+async function translateWithMyMemory(text, source, target) {
+  const url = new URL("https://api.mymemory.translated.net/get");
+  url.searchParams.set("q", text);
+  url.searchParams.set("langpair", `${source}|${target}`);
+  const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+  if (!response.ok) throw new Error(`Translation failed: ${response.status}`);
+  const data = await response.json();
+  if (Number(data?.responseStatus) >= 400) throw new Error(data?.responseDetails || "MyMemory rejected the request");
+  return assertTranslated(text, data?.responseData?.translatedText);
+}
+
+async function translateWithLibreTranslate(endpoint, text, source, target) {
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      q: text,
+      source: source.split("-")[0],
+      target: target.split("-")[0],
+      format: "text",
+    }),
+    signal: AbortSignal.timeout(7000),
+  });
+  if (!response.ok) throw new Error(`LibreTranslate failed: ${response.status}`);
+  const data = await response.json();
+  return assertTranslated(text, data?.translatedText);
+}
+
+async function translateMessage(text, source, target) {
+  if (source === target) return text;
+  try {
+    return await translateWithMyMemory(text, source, target);
+  } catch (primaryError) {
+    console.warn("MyMemory unavailable", primaryError.message);
+  }
+
+  return Promise.any([
+    translateWithLibreTranslate("https://translate.flossboxin.org.in/translate", text, source, target),
+    translateWithLibreTranslate("https://lt.blitzw.in/translate", text, source, target),
+  ]);
 }
 
 function roomState(roomId) {
@@ -120,11 +162,13 @@ io.on("connection", (socket) => {
     const target = translationCode(room.languages[recipientRole]);
     let translatedText = cleanText;
     let translated = false;
+    let translationFailed = false;
     try {
       translatedText = await translateMessage(cleanText, source, target);
       translated = translatedText !== cleanText;
     } catch (error) {
-      console.warn("Translation unavailable", error.message);
+      translationFailed = source !== target;
+      console.warn("Translation unavailable", error.message || "All providers failed");
     }
 
     const baseMessage = {
@@ -134,7 +178,12 @@ io.on("connection", (socket) => {
     };
     socket.emit("chat", { ...baseMessage, text: cleanText, translated: false });
     const recipientId = room[recipientRole];
-    if (recipientId) io.to(recipientId).emit("chat", { ...baseMessage, text: translatedText, translated });
+    if (recipientId) io.to(recipientId).emit("chat", {
+      ...baseMessage,
+      text: translatedText,
+      translated,
+      translationFailed,
+    });
   });
 
   socket.on("disconnect", () => {

@@ -2,128 +2,193 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#090b12" />
-    <meta name="description" content="With U — sala privada para assistir e ouvir juntos." />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237c5cff'/%3E%3Cpath d='M18 23h28v18H18z' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='m29 28 10 4-10 5z' fill='white'/%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#050505" />
+    <meta name="description" content="With U — watch parties privadas para assistir e ouvir junto com várias pessoas." />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23E50914'/%3E%3Cpath d='M20 16h8l16 32h-8z' fill='white'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <title>With U — Sala privada</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>With U — Watch together</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <header class="topbar">
-        <a class="brand" href="/" aria-label="With U">
-          <span class="brand-mark" aria-hidden="true">▶</span>
-          <span>with u</span>
-        </a>
-        <div class="top-actions">
-          <select id="language" class="language" aria-label="Idioma">
-            <option value="pt">PT</option>
-            <option value="ru">RU</option>
-            <option value="en">EN</option>
-            <option value="zh">ZH</option>
-          </select>
-          <span id="connectionPill" class="pill"><i></i><span data-i18n="offline">Desconectado</span></span>
-        </div>
-      </header>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="With U">
+        <span class="brand-mark" aria-hidden="true">W</span>
+        <span>WITH U</span>
+      </a>
+      <div class="top-actions">
+        <select id="language" class="language" aria-label="Idioma">
+          <option value="pt">PT</option>
+          <option value="ru">RU</option>
+          <option value="en">EN</option>
+          <option value="zh">ZH</option>
+        </select>
+        <span id="connectionPill" class="connection-pill"><i></i><span data-i18n="offline">Offline</span></span>
+      </div>
+    </header>
 
+    <main>
       <section id="lobby" class="lobby">
-        <div class="lobby-copy">
-          <p class="eyebrow" data-i18n="privateRoom">SALA PRIVADA · 2 PESSOAS</p>
-          <h1 data-i18n="together">A distância fica menor quando vocês assistem juntos.</h1>
-          <p data-i18n="intro">Compartilhe uma aba, sua tela ou um arquivo reproduzido no computador. O áudio e o vídeo vão direto para a outra pessoa.</p>
+        <div class="hero-glow" aria-hidden="true"></div>
+        <div class="hero-content">
+          <span class="hero-kicker" data-i18n="watchParty">WATCH PARTY PRIVADA</span>
+          <h1 data-i18n="together">Assista junto. Onde quer que todo mundo esteja.</h1>
+          <p data-i18n="intro">Crie uma sala, convide várias pessoas e compartilhe uma aba, a tela inteira ou só o áudio. Qualquer pessoa da sala pode transmitir.</p>
+          <div class="hero-actions">
+            <button id="createRoom" class="button primary large">
+              <span aria-hidden="true">▶</span>
+              <span data-i18n="create">Criar uma sala</span>
+            </button>
+            <form id="joinForm" class="quick-join">
+              <input id="roomCode" maxlength="6" autocomplete="off" placeholder="CÓDIGO" aria-label="Código da sala" />
+              <button class="button secondary large" type="submit" data-i18n="enter">Entrar</button>
+            </form>
+          </div>
+          <p class="hero-footnote" data-i18n="capacity">Até 8 pessoas por sala · sem conta · chat com tradução automática</p>
         </div>
-        <div class="lobby-actions panel">
-          <button id="createRoom" class="button primary">
-            <span class="button-icon">＋</span><span data-i18n="create">Criar uma sala</span>
-          </button>
-          <div class="divider"><span data-i18n="or">ou</span></div>
-          <form id="joinForm" class="join-form">
-            <label for="roomCode" data-i18n="haveCode">Já tem um código?</label>
-            <div class="join-row">
-              <input id="roomCode" maxlength="6" autocomplete="off" placeholder="A7K9Q2" aria-label="Código da sala" />
-              <button class="button secondary" type="submit" data-i18n="enter">Entrar</button>
-            </div>
-          </form>
+
+        <div class="preview-stack" aria-hidden="true">
+          <div class="preview-card preview-main">
+            <div class="preview-topline"><span></span><span></span><span></span></div>
+            <div class="preview-play">▶</div>
+            <div class="preview-caption">Movie night</div>
+          </div>
+          <div class="preview-card preview-chat">
+            <span></span><span></span><span></span><span></span>
+          </div>
         </div>
+      </section>
+
+      <section class="benefits" aria-label="Recursos">
+        <article>
+          <span class="benefit-icon">◉</span>
+          <div><strong data-i18n="everyoneShares">Todo mundo pode transmitir</strong><small data-i18n="everyoneSharesHelp">Troquem quem está compartilhando sem recriar a sala.</small></div>
+        </article>
+        <article>
+          <span class="benefit-icon">∞</span>
+          <div><strong data-i18n="groupRoom">Feito para grupos</strong><small data-i18n="groupRoomHelp">Veja quem entrou e convide o grupo com um único link.</small></div>
+        </article>
+        <article>
+          <span class="benefit-icon">文</span>
+          <div><strong data-i18n="translation">Chat traduzido</strong><small data-i18n="translationHelp">Cada pessoa recebe as mensagens no idioma escolhido.</small></div>
+        </article>
       </section>
 
       <section id="room" class="room hidden">
-        <div class="room-heading">
-          <div class="room-identity">
-            <p class="eyebrow" data-i18n="room">SALA</p>
-            <div class="room-code-line">
+        <header class="room-header">
+          <div>
+            <span class="room-label" data-i18n="room">SALA</span>
+            <div class="room-title-row">
               <h1 id="roomCodeLabel">------</h1>
-              <span id="roleBadge" class="role-badge">HOST</span>
+              <button id="copyLink" class="icon-copy" title="Copiar convite" aria-label="Copiar convite">⧉</button>
             </div>
           </div>
-          <div class="room-actions">
-            <div class="presence">
-              <span><i id="hostDot"></i><span data-i18n="you">Você</span></span>
-              <span><i id="viewerDot"></i><span data-i18n="friend">Amiga</span></span>
-            </div>
-            <button id="copyLink" class="button invite-button" title="Copiar link">
-              <span aria-hidden="true">⧉</span><span data-i18n="invite">Copiar convite</span>
-            </button>
-            <button id="leaveRoom" class="icon-button" title="Sair da sala" aria-label="Sair da sala">×</button>
+          <div class="room-header-actions">
+            <div id="participantStack" class="participant-stack" aria-label="Participantes"></div>
+            <span id="participantCount" class="participant-count">1 / 8</span>
+            <button id="leaveRoom" class="button ghost compact" data-i18n="leave">Sair</button>
           </div>
-        </div>
+        </header>
 
-        <section id="shareControls" class="share-controls panel">
-          <div class="share-copy">
-            <strong data-i18n="shareHeading">O que você quer transmitir?</strong>
-            <span data-i18n="shareHelp">Para o Spotify, abra o Web Player em uma aba e compartilhe com áudio.</span>
-          </div>
-          <div class="share-actions">
-            <div class="share-modes" role="radiogroup" aria-label="Modo de transmissão">
-              <label><input type="radio" name="shareMode" value="screen-audio" checked /><span data-i18n="modeScreenAudio">Tela + áudio</span></label>
-              <label><input type="radio" name="shareMode" value="screen-only" /><span data-i18n="modeScreenOnly">Só tela</span></label>
-              <label><input type="radio" name="shareMode" value="audio-only" /><span data-i18n="modeAudioOnly">Só áudio</span></label>
-            </div>
-            <button id="startShare" class="button primary"><span aria-hidden="true">▣</span><span data-i18n="share">Iniciar transmissão</span></button>
-          </div>
-        </section>
+        <div class="room-layout">
+          <section class="watch-column">
+            <section class="stage">
+              <video id="remoteVideo" class="hidden" autoplay playsinline controls></video>
+              <audio id="remoteAudio" class="hidden" autoplay controls></audio>
+              <video id="localPreview" autoplay playsinline muted></video>
 
-        <div class="workspace">
-          <section class="stage panel">
-            <video id="remoteVideo" class="hidden" autoplay playsinline controls></video>
-            <audio id="remoteAudio" class="hidden" autoplay controls></audio>
-            <video id="localPreview" autoplay playsinline muted></video>
-            <button id="resumePlayback" class="resume-playback button primary hidden" type="button">
-              <span aria-hidden="true">▶</span><span data-i18n="playStream">Reproduzir transmissão</span>
-            </button>
-            <div id="emptyStage" class="empty-stage">
-              <div class="signal-art"><span></span><span></span><span></span></div>
-              <h2 id="stageTitle" data-i18n="ready">Pronto para transmitir</h2>
-              <p id="stageDescription" data-i18n="chooseTab">Escolha uma aba com áudio para ter o melhor resultado.</p>
-            </div>
-            <div class="stage-footer">
-              <span id="mediaStatus"><i></i><span data-i18n="waiting">Aguardando transmissão</span></span>
-              <button id="stopShare" class="button danger hidden" data-i18n="stop">Parar</button>
-            </div>
+              <div id="emptyStage" class="empty-stage">
+                <div class="empty-badge">WITH U</div>
+                <h2 id="stageTitle" data-i18n="ready">Pronto para assistir juntos</h2>
+                <p id="stageDescription" data-i18n="chooseTab">Quando alguém compartilhar uma aba, tela ou áudio, a transmissão aparece aqui.</p>
+              </div>
+
+              <div class="stage-topbar">
+                <span id="liveBadge" class="live-badge hidden"><i></i><span data-i18n="live">AO VIVO</span></span>
+                <span id="sharerName" class="sharer-name"></span>
+              </div>
+
+              <button id="resumePlayback" class="resume-playback button primary hidden" type="button">
+                <span aria-hidden="true">▶</span><span data-i18n="playStream">Reproduzir</span>
+              </button>
+
+              <div class="stage-controls">
+                <div class="media-state">
+                  <i></i>
+                  <span id="mediaStatus" data-i18n="waiting">Aguardando transmissão</span>
+                </div>
+                <button id="stopShare" class="button danger compact hidden" data-i18n="stop">Parar transmissão</button>
+              </div>
+            </section>
+
+            <section id="shareControls" class="share-dock">
+              <div class="share-dock-copy">
+                <strong data-i18n="shareHeading">Compartilhar com a sala</strong>
+                <span id="shareHelp" data-i18n="shareHelp">Qualquer pessoa pode assumir a transmissão quando estiver livre.</span>
+              </div>
+              <div class="share-toolbar">
+                <div class="share-modes" role="radiogroup" aria-label="Modo de transmissão">
+                  <label><input type="radio" name="shareMode" value="screen-audio" checked /><span>▣</span><b data-i18n="modeScreenAudio">Tela + áudio</b></label>
+                  <label><input type="radio" name="shareMode" value="screen-only" /><span>□</span><b data-i18n="modeScreenOnly">Tela</b></label>
+                  <label><input type="radio" name="shareMode" value="audio-only" /><span>♫</span><b data-i18n="modeAudioOnly">Áudio</b></label>
+                </div>
+                <button id="startShare" class="button primary share-button">
+                  <span aria-hidden="true">▶</span><span data-i18n="share">Transmitir</span>
+                </button>
+              </div>
+            </section>
           </section>
 
-          <aside class="chat panel">
-            <div class="chat-header">
-              <div><span>◌</span><h2 data-i18n="chat">Chat</h2></div>
-              <span id="peerStatus" data-i18n="waitingFriend">Aguardando amiga</span>
-            </div>
-            <div id="messages" class="messages">
-              <div class="system-message" data-i18n="secure">A sala é temporária. As mensagens desaparecem quando vocês saem.</div>
-            </div>
-            <form id="chatForm" class="chat-form">
-              <input id="chatInput" maxlength="300" autocomplete="off" data-i18n-placeholder="messagePlaceholder" placeholder="Escreva uma mensagem…" />
-              <button type="submit" aria-label="Enviar">➤</button>
-            </form>
+          <aside class="side-column">
+            <section class="people-panel panel">
+              <div class="panel-header">
+                <div>
+                  <span class="panel-eyebrow" data-i18n="watchingNow">ASSISTINDO AGORA</span>
+                  <h2 data-i18n="people">Pessoas</h2>
+                </div>
+                <button id="copyLinkSecondary" class="button secondary compact" data-i18n="invite">Convidar</button>
+              </div>
+              <div id="peopleList" class="people-list"></div>
+            </section>
+
+            <section class="chat panel">
+              <div class="panel-header chat-header">
+                <div>
+                  <span class="panel-eyebrow" data-i18n="roomChat">SALA</span>
+                  <h2 data-i18n="chat">Chat</h2>
+                </div>
+                <span id="peerStatus" class="chat-status">1 online</span>
+              </div>
+              <div id="messages" class="messages">
+                <div class="system-message" data-i18n="secure">As mensagens são temporárias e podem ser traduzidas automaticamente para cada pessoa.</div>
+              </div>
+              <form id="chatForm" class="chat-form">
+                <input id="chatInput" maxlength="300" autocomplete="off" data-i18n-placeholder="messagePlaceholder" placeholder="Escreva uma mensagem…" />
+                <button type="submit" aria-label="Enviar">➤</button>
+              </form>
+            </section>
           </aside>
         </div>
 
-        <div class="tip"><span>✦</span><p data-i18n="tip"><strong>Dica:</strong> no Chrome, escolha “Aba” e marque “Compartilhar áudio da aba”.</p></div>
+        <div class="mobile-room-bar">
+          <button id="mobileInvite" class="mobile-action">＋<span data-i18n="invite">Convidar</span></button>
+          <button id="mobileShare" class="mobile-action primary-mobile">▶<span data-i18n="share">Transmitir</span></button>
+          <button id="mobileChat" class="mobile-action">●<span data-i18n="chat">Chat</span></button>
+        </div>
       </section>
     </main>
+
+    <dialog id="nameDialog" class="name-dialog">
+      <form method="dialog" id="nameForm">
+        <span class="dialog-kicker">WITH U</span>
+        <h2 data-i18n="yourName">Como devemos chamar você?</h2>
+        <p data-i18n="yourNameHelp">Esse nome aparece para as outras pessoas da sala.</p>
+        <input id="displayName" maxlength="24" autocomplete="name" placeholder="Seu nome" data-i18n-placeholder="namePlaceholder" />
+        <button class="button primary large" value="confirm" data-i18n="continue">Continuar</button>
+      </form>
+    </dialog>
 
     <div id="toast" class="toast" role="status"></div>
     <script src="/socket.io/socket.io.js"></script>

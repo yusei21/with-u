@@ -11,6 +11,7 @@ const port = Number(process.env.PORT || 3000);
 const directory = path.dirname(fileURLToPath(import.meta.url));
 
 app.use(express.static(path.join(directory, "public")));
+
 app.get("/api/turn-credentials", async (_request, response) => {
   const credentialsUrl = process.env.METERED_TURN_API_URL;
   if (!credentialsUrl) {
@@ -29,12 +30,14 @@ app.get("/api/turn-credentials", async (_request, response) => {
     response.status(502).json({ error: "TURN credentials unavailable" });
   }
 });
+
 app.get("/room/:roomId", (_request, response) => {
   response.sendFile(path.join(directory, "public", "index.html"));
 });
 
 const rooms = new Map();
 const supportedLanguages = new Set(["pt", "ru", "en", "zh"]);
+const MAX_PARTICIPANTS = 8;
 
 function translationCode(language) {
   return language === "zh" ? "zh-CN" : language;
@@ -119,13 +122,14 @@ async function translateWithLibreTranslate(endpoint, text, source, target) {
 }
 
 async function translateMessage(text, source, target) {
+  if (source === target) return text;
+
   try {
     return await translateWithGoogle(text, target);
   } catch (googleError) {
     console.warn("Google Translate unavailable", googleError.message);
   }
 
-  if (source === target) return text;
   try {
     return await translateWithMyMemory(text, source, target);
   } catch (primaryError) {
@@ -138,108 +142,206 @@ async function translateMessage(text, source, target) {
   ]);
 }
 
+function sanitizeName(name) {
+  if (typeof name !== "string") return "Convidado";
+  const clean = name.trim().replace(/\s+/g, " ").slice(0, 24);
+  return clean || "Convidado";
+}
+
 function roomState(roomId) {
-  if (!rooms.has(roomId)) rooms.set(roomId, {
-    host: null,
-    viewer: null,
-    languages: { host: "pt", viewer: "ru" },
-  });
+  if (!rooms.has(roomId)) {
+    rooms.set(roomId, {
+      ownerId: null,
+      activeSharerId: null,
+      participants: new Map(),
+    });
+  }
   return rooms.get(roomId);
 }
 
-function emitPresence(roomId) {
+function publicRoomState(room) {
+  return {
+    ownerId: room.ownerId,
+    activeSharerId: room.activeSharerId,
+    participants: [...room.participants.values()].map(({ id, name, language, joinedAt }) => ({
+      id,
+      name,
+      language,
+      joinedAt,
+    })),
+  };
+}
+
+function emitRoomState(roomId) {
   const room = rooms.get(roomId);
   if (!room) return;
-  io.to(roomId).emit("presence", {
-    host: Boolean(room.host),
-    viewer: Boolean(room.viewer),
-  });
+  io.to(roomId).emit("room-state", publicRoomState(room));
 }
 
 io.on("connection", (socket) => {
-  socket.on("join-room", ({ roomId, role, language }, acknowledge) => {
-    if (!/^[A-Z0-9]{6}$/.test(roomId) || !["host", "viewer"].includes(role)) {
+  socket.on("join-room", ({ roomId, language, name }, acknowledge) => {
+    if (!/^[A-Z0-9]{6}$/.test(roomId)) {
       acknowledge?.({ ok: false, error: "invalid-room" });
       return;
     }
 
     const room = roomState(roomId);
-    if (room[role] && room[role] !== socket.id) {
-      acknowledge?.({ ok: false, error: "role-taken" });
+    if (room.participants.size >= MAX_PARTICIPANTS) {
+      acknowledge?.({ ok: false, error: "room-full" });
       return;
     }
 
-    room[role] = socket.id;
-    room.languages[role] = supportedLanguages.has(language) ? language : (role === "host" ? "pt" : "ru");
+    const participant = {
+      id: socket.id,
+      name: sanitizeName(name),
+      language: supportedLanguages.has(language) ? language : "pt",
+      joinedAt: Date.now(),
+    };
+
+    room.participants.set(socket.id, participant);
+    if (!room.ownerId) room.ownerId = socket.id;
+
     socket.data.roomId = roomId;
-    socket.data.role = role;
-    socket.data.language = room.languages[role];
+    socket.data.language = participant.language;
     socket.join(roomId);
-    acknowledge?.({ ok: true });
-    emitPresence(roomId);
-    socket.to(roomId).emit("peer-ready", { role });
+
+    acknowledge?.({
+      ok: true,
+      participantId: socket.id,
+      state: publicRoomState(room),
+      maxParticipants: MAX_PARTICIPANTS,
+    });
+
+    socket.to(roomId).emit("participant-joined", participant);
+    emitRoomState(roomId);
   });
 
-  socket.on("update-language", ({ roomId, language }) => {
-    const { role } = socket.data;
+  socket.on("update-profile", ({ roomId, language, name }) => {
+    if (socket.data.roomId !== roomId) return;
     const room = rooms.get(roomId);
-    if (!room || room[role] !== socket.id || !supportedLanguages.has(language)) return;
-    room.languages[role] = language;
-    socket.data.language = language;
+    const participant = room?.participants.get(socket.id);
+    if (!participant) return;
+
+    if (supportedLanguages.has(language)) {
+      participant.language = language;
+      socket.data.language = language;
+    }
+    if (typeof name === "string") participant.name = sanitizeName(name);
+    emitRoomState(roomId);
   });
 
-  socket.on("signal", ({ roomId, payload }) => {
-    if (socket.data.roomId === roomId) socket.to(roomId).emit("signal", payload);
+  socket.on("begin-share", ({ roomId }, acknowledge) => {
+    if (socket.data.roomId !== roomId) return acknowledge?.({ ok: false, error: "invalid-room" });
+    const room = rooms.get(roomId);
+    if (!room?.participants.has(socket.id)) return acknowledge?.({ ok: false, error: "invalid-room" });
+
+    if (room.activeSharerId && room.activeSharerId !== socket.id) {
+      const active = room.participants.get(room.activeSharerId);
+      acknowledge?.({ ok: false, error: "share-busy", activeSharerName: active?.name || "alguém" });
+      return;
+    }
+
+    room.activeSharerId = socket.id;
+    acknowledge?.({ ok: true });
+    io.to(roomId).emit("share-owner", { sharerId: socket.id });
+    emitRoomState(roomId);
+  });
+
+  socket.on("stop-share", ({ roomId }) => {
+    const room = rooms.get(roomId);
+    if (!room || socket.data.roomId !== roomId || room.activeSharerId !== socket.id) return;
+    room.activeSharerId = null;
+    io.to(roomId).emit("share-stopped", { sharerId: socket.id });
+    emitRoomState(roomId);
+  });
+
+  socket.on("signal", ({ roomId, targetId, payload }) => {
+    const room = rooms.get(roomId);
+    if (
+      socket.data.roomId !== roomId ||
+      !room?.participants.has(socket.id) ||
+      !room.participants.has(targetId)
+    ) return;
+
+    io.to(targetId).emit("signal", {
+      fromId: socket.id,
+      payload,
+    });
   });
 
   socket.on("chat", async ({ roomId, text }) => {
     if (socket.data.roomId !== roomId || typeof text !== "string") return;
     const cleanText = text.trim().slice(0, 300);
     if (!cleanText) return;
+
     const room = rooms.get(roomId);
-    if (!room) return;
+    const sender = room?.participants.get(socket.id);
+    if (!room || !sender) return;
 
     const source = detectLanguage(cleanText);
-    const recipientRole = socket.data.role === "host" ? "viewer" : "host";
-    const target = translationCode(room.languages[recipientRole]);
-    let translatedText = cleanText;
-    let translated = false;
-    let translationFailed = false;
-    try {
-      translatedText = await translateMessage(cleanText, source, target);
-      translated = translatedText !== cleanText;
-    } catch (error) {
-      translationFailed = source !== target;
-      console.warn("Translation unavailable", error.message || "All providers failed");
-    }
-
     const baseMessage = {
       id: `${Date.now()}-${socket.id}`,
-      sender: socket.data.role,
+      senderId: socket.id,
+      senderName: sender.name,
       sentAt: new Date().toISOString(),
     };
+
     socket.emit("chat", { ...baseMessage, text: cleanText, translated: false });
-    const recipientId = room[recipientRole];
-    if (recipientId) io.to(recipientId).emit("chat", {
-      ...baseMessage,
-      text: translatedText,
-      translated,
-      translationFailed,
-    });
+
+    const translatedByTarget = new Map();
+    await Promise.all([...room.participants.values()]
+      .filter((participant) => participant.id !== socket.id)
+      .map(async (recipient) => {
+        const target = translationCode(recipient.language);
+        let translatedText = cleanText;
+        let translated = false;
+        let translationFailed = false;
+
+        if (source !== target) {
+          try {
+            if (!translatedByTarget.has(target)) {
+              translatedByTarget.set(target, translateMessage(cleanText, source, target));
+            }
+            translatedText = await translatedByTarget.get(target);
+            translated = translatedText !== cleanText;
+          } catch (error) {
+            translationFailed = true;
+            console.warn("Translation unavailable", error.message || "All providers failed");
+          }
+        }
+
+        io.to(recipient.id).emit("chat", {
+          ...baseMessage,
+          text: translatedText,
+          translated,
+          translationFailed,
+        });
+      }));
   });
 
   socket.on("disconnect", () => {
-    const { roomId, role } = socket.data;
+    const { roomId } = socket.data;
     const room = rooms.get(roomId);
-    if (!room || room[role] !== socket.id) return;
-    if (role === "host") {
-      socket.to(roomId).emit("room-closed");
+    if (!room?.participants.has(socket.id)) return;
+
+    room.participants.delete(socket.id);
+    socket.to(roomId).emit("participant-left", { participantId: socket.id });
+
+    if (room.activeSharerId === socket.id) {
+      room.activeSharerId = null;
+      socket.to(roomId).emit("share-stopped", { sharerId: socket.id });
+    }
+
+    if (room.participants.size === 0) {
       rooms.delete(roomId);
       return;
     }
-    room.viewer = null;
-    socket.to(roomId).emit("peer-left", { role });
-    emitPresence(roomId);
+
+    if (room.ownerId === socket.id) {
+      room.ownerId = room.participants.keys().next().value;
+    }
+
+    emitRoomState(roomId);
   });
 });
 

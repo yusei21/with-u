@@ -30,6 +30,7 @@ const elements = {
   toast: $("#toast"),
   leave: $("#leaveRoom"),
   resume: $("#resumePlayback"),
+  fullscreen: $("#fullscreenButton"),
   participantStack: $("#participantStack"),
   participantCount: $("#participantCount"),
   peopleList: $("#peopleList"),
@@ -64,7 +65,8 @@ const translations = {
     audioOnly: "Recebendo áudio", shareEnded: "A transmissão terminou", shareError: "Não foi possível iniciar a transmissão",
     noAudio: "Nenhum áudio foi selecionado", shareBusy: "já está transmitindo", translated: "Traduzido",
     translationFailed: "Tradução indisponível", you: "Você", owner: "Criador da sala", viewer: "Na sala",
-    sharingNow: "Transmitindo agora", onlinePeople: "online", someone: "Alguém"
+    sharingNow: "Transmitindo agora", onlinePeople: "online", someone: "Alguém",
+    fullscreen: "Tela cheia", exitFullscreen: "Sair da tela cheia"
   },
   en: {
     offline: "Offline", online: "Connected", watchParty: "PRIVATE WATCH PARTY",
@@ -88,7 +90,8 @@ const translations = {
     audioOnly: "Receiving audio", shareEnded: "The stream ended", shareError: "Could not start streaming",
     noAudio: "No audio was selected", shareBusy: "is already streaming", translated: "Translated",
     translationFailed: "Translation unavailable", you: "You", owner: "Room creator", viewer: "In the room",
-    sharingNow: "Streaming now", onlinePeople: "online", someone: "Someone"
+    sharingNow: "Streaming now", onlinePeople: "online", someone: "Someone",
+    fullscreen: "Fullscreen", exitFullscreen: "Exit fullscreen"
   },
   ru: {
     offline: "Не подключено", online: "Подключено", watchParty: "ПРИВАТНАЯ КОМНАТА",
@@ -112,7 +115,8 @@ const translations = {
     audioOnly: "Идёт аудио", shareEnded: "Трансляция завершена", shareError: "Не удалось начать трансляцию",
     noAudio: "Аудио не выбрано", shareBusy: "уже ведёт трансляцию", translated: "Переведено",
     translationFailed: "Перевод недоступен", you: "Вы", owner: "Создатель комнаты", viewer: "В комнате",
-    sharingNow: "Сейчас транслирует", onlinePeople: "онлайн", someone: "Участник"
+    sharingNow: "Сейчас транслирует", onlinePeople: "онлайн", someone: "Участник",
+    fullscreen: "На весь экран", exitFullscreen: "Выйти из полноэкранного режима"
   },
   zh: {
     offline: "未连接", online: "已连接", watchParty: "私人观影房",
@@ -136,7 +140,8 @@ const translations = {
     audioOnly: "正在接收音频", shareEnded: "直播已结束", shareError: "无法开始直播",
     noAudio: "未选择音频", shareBusy: "正在直播", translated: "已翻译",
     translationFailed: "翻译不可用", you: "你", owner: "房间创建者", viewer: "在房间中",
-    sharingNow: "正在直播", onlinePeople: "在线", someone: "有人"
+    sharingNow: "正在直播", onlinePeople: "在线", someone: "有人",
+    fullscreen: "全屏", exitFullscreen: "退出全屏"
   },
 };
 
@@ -178,6 +183,7 @@ function applyLanguage() {
   });
   renderParticipants();
   updateSharingUi();
+  syncFullscreenButton();
 }
 
 function showToast(text) {
@@ -542,6 +548,36 @@ function stopSharing() {
   updateSharingUi();
 }
 
+function fullscreenElement() {
+  return document.fullscreenElement || document.webkitFullscreenElement || null;
+}
+
+function syncFullscreenButton() {
+  if (!elements.fullscreen) return;
+  const active = Boolean(fullscreenElement());
+  const label = elements.fullscreen.querySelector(".fullscreen-label");
+  const text = t(active ? "exitFullscreen" : "fullscreen");
+  if (label) label.textContent = text;
+  elements.fullscreen.title = text;
+  elements.fullscreen.setAttribute("aria-label", text);
+  elements.fullscreen.setAttribute("aria-pressed", String(active));
+}
+
+async function toggleFullscreen() {
+  try {
+    if (fullscreenElement()) {
+      if (document.exitFullscreen) await document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      return;
+    }
+
+    if (elements.stage.requestFullscreen) await elements.stage.requestFullscreen();
+    else if (elements.stage.webkitRequestFullscreen) elements.stage.webkitRequestFullscreen();
+  } catch (error) {
+    console.error("Fullscreen error", error);
+  }
+}
+
 async function copyInvite() {
   try {
     await navigator.clipboard.writeText(location.href);
@@ -580,6 +616,22 @@ elements.roomInput.addEventListener("input", () => {
 });
 elements.start.addEventListener("click", startSharing);
 elements.stop.addEventListener("click", stopSharing);
+elements.fullscreen.addEventListener("click", toggleFullscreen);
+elements.stage.addEventListener("dblclick", (event) => {
+  if (event.target.closest?.("button, input, audio")) return;
+  event.preventDefault();
+  toggleFullscreen();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key.toLowerCase() !== "f" || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (elements.room.classList.contains("hidden") || elements.nameDialog.open) return;
+  const target = event.target;
+  if (target?.matches?.("input, textarea, select, [contenteditable='true']")) return;
+  event.preventDefault();
+  toggleFullscreen();
+});
+document.addEventListener("fullscreenchange", syncFullscreenButton);
+document.addEventListener("webkitfullscreenchange", syncFullscreenButton);
 elements.copy.addEventListener("click", copyInvite);
 elements.copySecondary.addEventListener("click", copyInvite);
 elements.mobileInvite.addEventListener("click", copyInvite);

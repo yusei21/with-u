@@ -65,3 +65,25 @@ input{background:#111;color:#fff;border:1px solid #515151;border-radius:4px;min-
 }
 @media(max-width:540px){.brand span:last-child{font-size:.78rem}.hero-content h1{font-size:3.25rem}.hero-content>p:not(.hero-footnote){font-size:.95rem}.hero-actions .button.large{min-height:48px}.room-title-row h1{font-size:1.15rem}.participant-count{font-size:.68rem}.stage{aspect-ratio:16/10}.empty-stage h2{font-size:1.25rem}.empty-stage p{font-size:.75rem}.share-dock{padding:12px}.share-dock-copy span{font-size:.64rem}.share-toolbar{flex-direction:column}.share-modes{width:100%}.share-modes b{display:none}.share-button{width:100%}.people-panel{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+
+
+.stage-action-group{display:flex;align-items:center;gap:8px}
+.fullscreen-button{min-height:36px;border:1px solid rgba(255,255,255,.22);border-radius:5px;padding:0 12px;background:rgba(18,18,18,.82);color:#fff;display:inline-flex;align-items:center;gap:8px;font-size:.76rem;font-weight:700;backdrop-filter:blur(8px);transition:background .16s,border-color .16s,transform .16s}
+.fullscreen-button:hover{background:#2b2b2b;border-color:rgba(255,255,255,.42);transform:translateY(-1px)}
+.fullscreen-icon{font-size:1rem;line-height:1}
+.stage:fullscreen{width:100vw;height:100vh;max-width:none;min-height:100vh;aspect-ratio:auto;border:0;border-radius:0;background:#000}
+.stage:fullscreen video{width:100vw;height:100vh;object-fit:contain}
+.stage:fullscreen .stage-controls{padding:52px 24px 20px}
+.stage:fullscreen .stage-topbar{left:24px;top:20px}
+.stage:fullscreen .fullscreen-button{background:rgba(0,0,0,.72)}
+.stage:-webkit-full-screen{width:100vw;height:100vh;max-width:none;min-height:100vh;aspect-ratio:auto;border:0;border-radius:0;background:#000}
+.stage:-webkit-full-screen video{width:100vw;height:100vh;object-fit:contain}
+
+@media(min-width:821px){
+  .stage{cursor:default}
+  .fullscreen-button{min-height:40px;padding:0 14px}
+}
+@media(max-width:820px){
+  .fullscreen-label{display:none}
+  .fullscreen-button{width:40px;padding:0;justify-content:center}
+}

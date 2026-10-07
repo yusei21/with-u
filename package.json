@@ -1,8 +1,8 @@
 {
   "name": "with-u",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Sala privada de transmissão WebRTC para duas pessoas",
+  "description": "Watch party privada WebRTC para grupos, com compartilhamento de tela e chat traduzido",
   "type": "module",
   "scripts": {
     "dev": "node --watch server.js",
